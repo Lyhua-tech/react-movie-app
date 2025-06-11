@@ -1,8 +1,8 @@
 import React from 'react'
 
-const MovieCard = ({ movie: { title, poster_path, release_date, vote_average,original_language }}) => {
+const MovieCard = ({ movie: { title, poster_path, release_date, vote_average,original_language },className}) => {
   return (
-    <div className='movie-card'>
+    <div className={`movie-card hover:scale-105 transition-all duration-300 cursor-pointer snap-center ${className}`}>
         <img src={poster_path ? `https://image.tmdb.org/t/p/w500/${poster_path}` : "./no-movie.png"} alt={title} />
         <div className='mt-4'>
             <h3>{title}</h3>
