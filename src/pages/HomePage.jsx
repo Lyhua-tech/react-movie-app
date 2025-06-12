@@ -37,8 +37,8 @@ const HomePage = () => {
 
   const fetchMovies = async (query, page) => {
     const url = query
-      ? `${API_URL}/search/movie?query=${query}&page=${page}`
-      : `${API_URL}/discover/movie?sort_by=popularity.desc&page=${page}`;
+      ? `${API_URL}/search/movie?query=${query}&page=${page}&include_adult=false`
+      : `${API_URL}/discover/movie?sort_by=popularity.desc&page=${page}&include_adult=false`;
     setLoading(true);
     try {
       const response = await fetch(url, API_OPTIONS);
@@ -65,7 +65,7 @@ const HomePage = () => {
   };
 
   const fetchTopRatedMovies = async (page) => {
-    const url = `${API_URL}/discover/movie?sort_by=vote_count.desc&page=${page}&limit=10`;
+    const url = `${API_URL}/discover/movie?sort_by=vote_count.desc&page=${page}&limit=10&include_adult=false`;
     setLoading(true);
     try {
       const response = await fetch(url, API_OPTIONS);
@@ -113,11 +113,12 @@ const HomePage = () => {
                 <h2 className="text-2xl font-bold mt-4">Top Rated Movies</h2>
                 <ul className="flex overflow-x-scroll gap-4 snap-x snap-mandatory scroll-smooth scrollbar-hide w-full">
                   {topRatedMovies.map((movie) => (
-                    <MovieCard
-                      movie={movie}
-                      className="shrink-0 size-1/7"
+                    <li
                       key={movie.id}
-                    />
+                      className="shrink-0 w-3/4 xs:w-2/3 sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 2xl:w-1/6 snap-start"
+                    >
+                      <MovieCard movie={movie} className="w-full h-full" />
+                    </li>
                   ))}
                 </ul>
               </>

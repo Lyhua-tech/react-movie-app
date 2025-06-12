@@ -57,9 +57,12 @@ const MovieDetails = () => {
   if (!movie) return <div>No movie found.</div>;
 
   return (
-    <div className="flex flex-col items-start justify-start p-4">
-      <h1>{movie.title}</h1>
-      <div className="w-full h-[600px] mb-4">
+    <div className="flex flex-col gap-6 p-4 max-w-5xl mx-auto">
+      <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">
+        {movie.title}
+      </h1>
+      {/* Trailer Block */}
+      <div className="w-full aspect-video mb-2">
         {trailerKey ? (
           <iframe
             src={`https://www.youtube.com/embed/${trailerKey}`}
@@ -67,22 +70,27 @@ const MovieDetails = () => {
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="w-full  h-full rounded-lg"
+            className="w-full h-full rounded-lg"
           ></iframe>
         ) : (
-          <p>No trailer available</p>
+          <div className="flex items-center justify-center w-full h-full bg-gray-800 rounded-lg text-white">
+            No trailer available
+          </div>
         )}
       </div>
-      <div className="flex items-center justify-between h-full">
+      {/* Responsive Layout: mobile = stacked, md+ = side-by-side */}
+      <div className="flex flex-col md:flex-row md:items-start md:gap-8 w-full">
         {movie.poster_path && (
-          <img
-            src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-            alt={movie.title}
-            className="rounded-lg shadow-lg"
-            loading="lazy"
-          />
+          <div className="w-full flex justify-center md:w-auto md:justify-start mb-4 md:mb-0">
+            <img
+              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+              alt={movie.title}
+              className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg md:w-72"
+              loading="lazy"
+            />
+          </div>
         )}
-        <ul className="max-w-5xl flex flex-col space-y-3 bg-primary p-5 h-[450px] opacity-90 rounded-lg shadow-lg text-white">
+        <ul className="flex flex-col gap-3 bg-primary p-5 opacity-90 rounded-lg shadow-lg text-white w-full md:w-auto">
           <li>
             <p className="truncate max-w-xs mb-2">
               <strong>Original Title:</strong> {movie.original_title}
@@ -95,7 +103,10 @@ const MovieDetails = () => {
             <strong>Rating:</strong> {movie.vote_average} / 10
           </li>
           <li>
-            <strong>Overview:</strong> {movie.overview}
+            <strong>Overview:</strong>
+            <span className="block mt-1 text-gray-200 whitespace-pre-line">
+              {movie.overview}
+            </span>
           </li>
           <li>
             <strong>Genres:</strong>{" "}
