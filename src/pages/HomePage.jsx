@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Search from "../components/Search";
 import Spinner from "../components/Spinner";
 import MovieCard from "../components/MovieCard";
-import { Link } from "react-router-dom";
+import { updateSearchCount, getSearchCounts } from "../../appwrite";
 import { useDebounce } from "@reactuses/core";
 
 const API_KEY = import.meta.env.VITE_MOVIES_API_KEY;
@@ -26,6 +26,7 @@ const HomePage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [useDebounceSearch, setUseDebounceSearch] = useState("");
+  const [trendingMovies, setTrendingMovies] = useState([]);
 
   useDebounce(
     () => {
@@ -37,7 +38,9 @@ const HomePage = () => {
 
   const fetchMovies = async (query, page) => {
     const url = query
-      ? `${API_URL}/search/movie?query=${query}&page=${page}&include_adult=false`
+      ? `${API_URL}/search/movie?query=${encodeURIComponent(
+          query
+        )}&page=${page}&include_adult=false`
       : `${API_URL}/discover/movie?sort_by=popularity.desc&page=${page}&include_adult=false`;
     setLoading(true);
     try {
@@ -56,6 +59,10 @@ const HomePage = () => {
 
       setMovies(data.results);
       setTotalPages(data.total_pages);
+      if (query && data.results.length > 0) {
+        // Update search count in Appwrite
+        await updateSearchCount(query, data.results[0]);
+      }
     } catch (error) {
       console.error(`Error fetching movies: ${error}`);
       setErrorMessage("Something went wrong. Please try again later.");
@@ -83,10 +90,24 @@ const HomePage = () => {
     }
   };
 
+  const fetchTrendingMovies = async () => {
+    try {
+      const result = await getSearchCounts();
+      setTrendingMovies(result);
+    } catch (error) {
+      console.error("Error fetching trending movies:", error);
+      setErrorMessage("Failed to fetch trending movies.");
+    }
+  };
+
   useEffect(() => {
     fetchMovies(useDebounceSearch, page);
     fetchTopRatedMovies(page);
   }, [useDebounceSearch, page]);
+
+  useEffect(() => {
+    fetchTrendingMovies();
+  }, []);
 
   return (
     <div>
@@ -124,6 +145,21 @@ const HomePage = () => {
               </>
             ) : (
               <p>No movies found</p>
+            )}
+
+            {trendingMovies.length > 0 && (
+              <section className="trending">
+                <h2>Trending Movies</h2>
+
+                <ul>
+                  {trendingMovies.map((movie, index) => (
+                    <li key={movie.$id}>
+                      <p>{index + 1}</p>
+                      <img src={movie.poster_url} alt={movie.title} />
+                    </li>
+                  ))}
+                </ul>
+              </section>
             )}
 
             <h2>All Movies</h2>

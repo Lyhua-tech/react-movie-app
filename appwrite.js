@@ -25,11 +25,24 @@ export const updateSearchCount = async (searchTerm, movie) => {
       await database.createDocument(DATABASE_ID, COLLECTION_ID, ID.unique(), {
         searchTerm: searchTerm,
         count: 1,
-        movieId: movie.id,
+        movie_id: movie.id,
         poster_url: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
       });
     }
   } catch (error) {
     console.error("Error updating search count:", error);
+  }
+};
+
+export const getSearchCounts = async () => {
+  try {
+    const result = await database.listDocuments(DATABASE_ID, COLLECTION_ID, [
+      Query.orderDesc("count"),
+      Query.limit(5),
+    ]);
+
+    return result.documents;
+  } catch (error) {
+    console.error("Error fetching search counts:", error);
   }
 };
